@@ -4,25 +4,25 @@ using Raylib_cs;
 
 namespace FishGame.Game;
 
-class Menu
+class Toolbar
 {
     private int _menuMargin = 20;
     private int _menuPadding = 5;
-    private int _menuHeight = 100;
+    private int _menuHeight = 60;
     private int _menuContentMargin = 5;
 
     private List<Button> _buttons = new();
 
-    public Menu()
+    public Toolbar()
     {
         _buttons.Add(new Button("Add", () =>
         {
-            GlobalState.Fish.Add(Fish.WithPosition(new Vector2(Raylib.GetRandomValue(50, 150))));
-            if (GlobalState.Fish.Count == 1) throw new Exception();
+            GlobalState.FishCollection.Add(Fish.WithPosition(new Vector2(Raylib.GetRandomValue(50, 150))));
         }));
         _buttons.Add(new Button("Remove", () =>
         {
-            GlobalState.Fish.RemoveAt(GlobalState.Fish.Count - 1);
+            if (GlobalState.FishCollection.Count == 0) return;
+            GlobalState.FishCollection.RemoveAt(GlobalState.FishCollection.Count - 1);
         }));
     }
 
@@ -35,8 +35,7 @@ class Menu
             Size = new Vector2(screenWidth - _menuMargin * 2, _menuHeight),
             Position = new Vector2(_menuMargin, screenHeight - _menuMargin - _menuHeight),
         };
-        var color = Color.Blue;
-        color.A = 50;
+        var color = GruvboxColors.Blue;
         draw.Rectangle(outerRect, color);
 
         var innerRect = new Rectangle
@@ -45,12 +44,8 @@ class Menu
             Position = outerRect.Position + new Vector2(_menuPadding),
         };
 
-        color = Color.White;
-        color.A = 200;
-
+        color = GruvboxColors.ForegroundLight;
         draw.Rectangle(innerRect, color);
-
-        // draw.Text("Dummy text only for demonstration", innerRect.Position + new Vector2(_menuContentMargin), Color.SkyBlue);
 
         int gap = 10;
         for (int i = 0; i < _buttons.Count; i++)

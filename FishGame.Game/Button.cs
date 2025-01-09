@@ -7,7 +7,7 @@ namespace FishGame.Game;
 class Button
 {
     public const int Width = 100;
-    public const int Height = 80;
+    public const int Height = 40;
     private readonly string _text;
     private readonly Action _onClick;
 
@@ -37,10 +37,11 @@ class Button
 
     public void Draw(Draw draw)
     {
-        var padding = 20;
-        var bgColor = _hover ? Color.Yellow : Color.Gold;
+        var padding = 15;
+        var bgColor = _hover ? GruvboxColors.YellowDim : GruvboxColors.Yellow;
+        var fgColor = _hover ? GruvboxColors.Background : GruvboxColors.Foreground;
         draw.Rectangle(_rect, bgColor);
-        draw.Text(_text, _startPosition + new Vector2(padding), Color.Black);
+        draw.Text(_text, _startPosition + new Vector2(padding), fgColor);
     }
     public void Update()
     {

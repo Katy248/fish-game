@@ -9,13 +9,45 @@ Vector2 lastCursorPosition = Raylib.GetMousePosition();
 
 var window = new Window("Fish game", () =>
 {
-    foreach (var f in GlobalState.Fish)
+    foreach (var f in GlobalState.FishCollection)
     {
         f.Update(GlobalState.Camera);
     }
     GlobalState.Menu.Update();
 
-    // Move camera
+    MovingCamera(lastCursorPosition);
+    ZoomCamera();
+
+    lastCursorPosition = Raylib.GetMousePosition();
+    Drawing.Start(draw =>
+    {
+        draw.Clear(GruvboxColors.Background);
+
+        GlobalState.Camera.Draw(() =>
+        {
+            draw.Text("Some txt", new Vector2(10, 10), Color.Red);
+
+            foreach (var f in GlobalState.FishCollection)
+            {
+                f.Draw(draw);
+            }
+        });
+
+        GlobalState.Menu.Draw(draw);
+    });
+}, onInit: () =>
+{
+    GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
+    GlobalState.Camera.Target = new Vector2(0, 0);
+})
+.Size(800, 600)
+.TargetFps(60);
+
+window.Present();
+
+
+void MovingCamera(Vector2 lastCursorPosition)
+{
     if (Raylib.IsMouseButtonDown(MouseButton.Middle) || Raylib.IsKeyDown(KeyboardKey.Space) && Raylib.IsMouseButtonDown(MouseButton.Left))
     {
         GlobalState.Camera.Target += (lastCursorPosition - Raylib.GetMousePosition()) / GlobalState.Camera.Zoom;
@@ -27,41 +59,20 @@ var window = new Window("Fish game", () =>
     {
         Raylib.SetMouseCursor(MouseCursor.Arrow);
     }
-    // zoom camera
+}
+
+void ZoomCamera()
+{
     GlobalState.Camera.Zoom += Raylib.GetMouseWheelMove() * 0.05f;
-    lastCursorPosition = Raylib.GetMousePosition();
-    Drawing.Start(draw =>
-    {
-        draw.Clear(Color.Gray);
-
-        Raylib.BeginMode2D(GlobalState.Camera);
-        {
-            draw.Text("Some txt", new Vector2(10, 10), Color.Red);
-
-            foreach (var f in GlobalState.Fish)
-            {
-                f.Draw(draw);
-            }
-        }
-        Raylib.EndMode2D();
-
-        GlobalState.Menu.Draw(draw);
-    });
-})
-.Size(800, 600)
-.TargetFps(60);
-
-GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
-GlobalState.Camera.Target = new Vector2(0, 0);
-
-window.Present();
+    if (GlobalState.Camera.Zoom > MaxZoom)
+        GlobalState.Camera.Zoom = 3;
+}
 
 static class GlobalState
 {
     public static Camera2D Camera = new Camera2D { Zoom = 1 };
-    public static List<Fish> Fish = [new Fish()];
-    public static Menu Menu = new Menu();
+    public static List<Fish> FishCollection = [Fish.WithPosition(new Vector2(150))];
+    public static Toolbar Menu = new Toolbar();
+    public static bool DarkModeEnabled = false;
 }
-
-
 
