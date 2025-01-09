@@ -3,7 +3,8 @@ using RayGame;
 using System.Numerics;
 using FishGame.Game;
 
-const int MaxZoom = 3;
+const float MinZoom = 2f;
+const float MaxZoom = 0.5f;
 
 Vector2 lastCursorPosition = Raylib.GetMousePosition();
 
@@ -33,6 +34,7 @@ var window = new Window("Fish game", () =>
             }
         });
 
+        draw.Text($"Camera zoom: {GlobalState.Camera.Zoom}", new Vector2(10, 10), Color.Red);
         GlobalState.Menu.Draw(draw);
     });
 }, onInit: () =>
@@ -64,8 +66,11 @@ void MovingCamera(Vector2 lastCursorPosition)
 void ZoomCamera()
 {
     GlobalState.Camera.Zoom += Raylib.GetMouseWheelMove() * 0.05f;
-    if (GlobalState.Camera.Zoom > MaxZoom)
-        GlobalState.Camera.Zoom = 3;
+
+    if (GlobalState.Camera.Zoom < MaxZoom)
+        GlobalState.Camera.Zoom = MaxZoom;
+    if (GlobalState.Camera.Zoom > MinZoom)
+        GlobalState.Camera.Zoom = MinZoom;
 }
 
 static class GlobalState
