@@ -17,6 +17,15 @@ public class Draw
     {
         Raylib.ClearBackground(color);
     }
+    public void Circle(Vector2 position, float radius, Color color)
+    {
+        Raylib.DrawCircleV(position, radius, color);
+    }
+
+    public void Rectangle(Rectangle rect, Color color)
+    {
+        Raylib.DrawRectangleRec(rect, color);
+    }
 }
 
 public static class Drawing

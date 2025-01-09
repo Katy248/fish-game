@@ -4,26 +4,44 @@ namespace RayGame;
 
 public class Window
 {
-    private readonly int width;
-    private readonly int height;
+    public const int DefaultWidth = 300;
+    public const int DefaultHeight = 300;
+
+    private int width;
+    private int height;
     private readonly string title;
-    private readonly Action beforeClose;
+    private readonly Action _onUpdate;
     private readonly Action? onClose;
 
-    public Window(int width, int height, string title, Action beforeClose, Action? onClose = null)
+    public Window(string title, Action onUpdate, int width = DefaultWidth, int height = DefaultHeight, Action? onClose = null)
     {
         this.width = width;
         this.height = height;
         this.title = title;
-        this.beforeClose = beforeClose;
+        this._onUpdate = onUpdate;
         this.onClose = onClose;
+    }
+    public Window Size(int width, int height)
+    {
+        this.width = width;
+        this.height = height;
+
+        Raylib.SetWindowSize(width, height);
+
+        return this;
+    }
+    public Window TargetFps(int fps)
+    {
+        Raylib.SetTargetFPS(fps);
+        return this;
     }
     public void Present()
     {
         Raylib.InitWindow(width, height, title);
+        Raylib.SetWindowState(ConfigFlags.ResizableWindow);
         while (!Raylib.WindowShouldClose())
         {
-            beforeClose();
+            _onUpdate();
         }
         onClose?.Invoke();
         Raylib.CloseWindow();
