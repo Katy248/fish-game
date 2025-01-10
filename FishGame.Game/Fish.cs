@@ -40,7 +40,13 @@ class Fish
         {
             drawRadius += 2;
         }
+
         d.Circle(_position, drawRadius, drawColor);
+
+        if (GlobalState.Camera.Zoom >= 1.4)
+        {
+            d.Text("Fish name", new Vector2(_position.X - 30, _position.Y + 30), GruvboxColors.Foreground);
+        }
     }
 
     public void Update(Camera2D cam)
@@ -76,6 +82,7 @@ class Fish
                     return direction * -1;
                 return direction;
             }
+
             _changeDirectionTimeout--;
 
             _moveDirectionX = changeDirection(_moveDirectionX);
