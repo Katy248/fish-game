@@ -15,15 +15,13 @@ class Toolbar
 
     public Toolbar()
     {
-        _buttons.Add(new Button("Add", () =>
-        {
-            GlobalState.FishCollection.Add(Fish.WithPosition(new Vector2(Raylib.GetRandomValue(50, 150))));
-        }));
+        _buttons.Add(new Button("Add",
+            () => { GlobalState.FishCollection.Add(Fish.WithPosition(new Vector2(Raylib.GetRandomValue(50, 150)))); }));
         _buttons.Add(new Button("Remove", () =>
         {
             if (GlobalState.FishCollection.Count == 0) return;
             GlobalState.FishCollection.RemoveAt(GlobalState.FishCollection.Count - 1);
-        }));
+        }, () => { return GlobalState.FishCollection.Count > 0; }));
     }
 
     public void Draw(Draw draw)
@@ -52,7 +50,8 @@ class Toolbar
         {
             var btn = _buttons[i];
 
-            btn.SetPosition(innerRect.Position + new Vector2(_menuContentMargin + gap * i + i * Button.Width, _menuContentMargin));
+            btn.SetPosition(innerRect.Position +
+                            new Vector2(_menuContentMargin + gap * i + i * Button.Width, _menuContentMargin));
             btn.Draw(draw);
         }
     }
