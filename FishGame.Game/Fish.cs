@@ -30,11 +30,11 @@ class Fish
     public void Draw(Draw d)
     {
         var drawRadius = _radius;
-        var drawColor = Color.Red;
+        var drawColor = GruvboxColors.Red;
         if (_captured)
         {
             drawRadius += 12;
-            drawColor = Color.Orange;
+            drawColor = GruvboxColors.Orange;
         }
         else if (_hover)
         {

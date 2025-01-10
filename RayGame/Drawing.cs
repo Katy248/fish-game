@@ -5,7 +5,7 @@ namespace RayGame;
 
 public class Draw
 {
-    public const int DefaultFontSize = 16;
+    public const int DefaultFontSize = 18;
     public const int DefaultFontSpacing = 1;
     public void Text(string text, Vector2 position, Color color, Font font = default, int fontSize = DefaultFontSize, int spacing = DefaultFontSpacing)
     {

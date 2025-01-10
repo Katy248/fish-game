@@ -6,14 +6,23 @@ using FishGame.Game;
 const float MinZoom = 2f;
 const float MaxZoom = 0.5f;
 
+var window = new Window("Fish game", onInit: () =>
+    {
+        GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
+        GlobalState.Camera.Target = new Vector2(0, 0);
+    })
+    .Size(800, 600)
+    .TargetFps(60);
+
 Vector2 lastCursorPosition = Raylib.GetMousePosition();
 
-var window = new Window("Fish game", () =>
+var gameplay = new Scene<string>("Dummy string data", obj =>
 {
     foreach (var f in GlobalState.FishCollection)
     {
         f.Update(GlobalState.Camera);
     }
+
     GlobalState.Menu.Update();
 
     MovingCamera(lastCursorPosition);
@@ -37,20 +46,40 @@ var window = new Window("Fish game", () =>
         draw.Text($"Camera zoom: {GlobalState.Camera.Zoom}", new Vector2(10, 10), Color.Red);
         GlobalState.Menu.Draw(draw);
     });
-}, onInit: () =>
-{
-    GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
-    GlobalState.Camera.Target = new Vector2(0, 0);
-})
-.Size(800, 600)
-.TargetFps(60);
+});
 
+var logoTimeout = window.GetTargetFps() * 5;
+var logo = new Scene<LogoSceneData>(new() { Timeout = logoTimeout, }, data =>
+{
+    data.Timeout--;
+    if (data.Timeout <= 0)
+        window.SetCurrentScene(gameplay);
+
+    Drawing.Start(draw =>
+    {
+        draw.Clear(GruvboxColors.ForegroundLight);
+        draw.Text("Art of defiance", new Vector2(10, 10), GruvboxColors.Background, fontSize: 50);
+        draw.Rectangle(
+            new Rectangle
+            {
+                Position = new Vector2(10 + (logoTimeout - data.Timeout) * 4, 10),
+                Size = new Vector2(1000, 50)
+            }, GruvboxColors.ForegroundLight);
+#if DEBUG
+        draw.Text($"Timeout: {data.Timeout / window.GetTargetFps()}s", new Vector2(10, 80), GruvboxColors.Background);
+#endif
+    });
+});
+
+
+window.SetCurrentScene(logo);
 window.Present();
 
 
 void MovingCamera(Vector2 lastCursorPosition)
 {
-    if (Raylib.IsMouseButtonDown(MouseButton.Middle) || Raylib.IsKeyDown(KeyboardKey.Space) && Raylib.IsMouseButtonDown(MouseButton.Left))
+    if (Raylib.IsMouseButtonDown(MouseButton.Middle) ||
+        Raylib.IsKeyDown(KeyboardKey.Space) && Raylib.IsMouseButtonDown(MouseButton.Left))
     {
         GlobalState.Camera.Target += (lastCursorPosition - Raylib.GetMousePosition()) / GlobalState.Camera.Zoom;
         GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
@@ -73,6 +102,11 @@ void ZoomCamera()
         GlobalState.Camera.Zoom = MinZoom;
 }
 
+class LogoSceneData
+{
+    public int Timeout;
+}
+
 static class GlobalState
 {
     public static Camera2D Camera = new Camera2D { Zoom = 1 };
@@ -80,4 +114,3 @@ static class GlobalState
     public static Toolbar Menu = new Toolbar();
     public static bool DarkModeEnabled = false;
 }
-
