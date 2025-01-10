@@ -13,13 +13,17 @@ var window = new Window("Fish game", onInit: () =>
     .Size(800, 600)
     .TargetFps(60);
 
-var gameplay = new Gameplay();
+var menu = new MainMenu(window);
 
 var logo = new Scene<LogoSceneData>(new(window.GetTargetFps() * 3), data =>
 {
     data.Timeout--;
+    if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+    {
+        data.Timeout = 10;
+    }
     if (data.Timeout <= 0)
-        window.SetCurrentScene(gameplay);
+        window.SetCurrentScene(menu);
 
     Drawing.Start(draw =>
     {
