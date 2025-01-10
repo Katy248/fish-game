@@ -1,8 +1,9 @@
 # TODO
 
-- [ ] Add calculated enable/disable states for buttons
+- [X] Add calculated enable/disable states for buttons
 - [ ] Add font
-- [ ] Add screens
+- [X] Add scenes system
+- [ ] Add scenes
     - [ ] Main menu
     - [ ] Logos
     - [ ] Gameplay
