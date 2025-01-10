@@ -2,9 +2,8 @@ using Raylib_cs;
 using RayGame;
 using System.Numerics;
 using FishGame.Game;
+using FishGame.Game.Scenes;
 
-const float MinZoom = 2f;
-const float MaxZoom = 0.5f;
 
 var window = new Window("Fish game", onInit: () =>
     {
@@ -14,42 +13,9 @@ var window = new Window("Fish game", onInit: () =>
     .Size(800, 600)
     .TargetFps(60);
 
-Vector2 lastCursorPosition = Raylib.GetMousePosition();
+var gameplay = new Gameplay();
 
-var gameplay = new Scene<string>("Dummy string data", obj =>
-{
-    foreach (var f in GlobalState.FishCollection)
-    {
-        f.Update(GlobalState.Camera);
-    }
-
-    GlobalState.Menu.Update();
-
-    MovingCamera(lastCursorPosition);
-    ZoomCamera();
-
-    lastCursorPosition = Raylib.GetMousePosition();
-    Drawing.Start(draw =>
-    {
-        draw.Clear(GruvboxColors.Background);
-
-        GlobalState.Camera.Draw(() =>
-        {
-            draw.Text("Some txt", new Vector2(10, 10), Color.Red);
-
-            foreach (var f in GlobalState.FishCollection)
-            {
-                f.Draw(draw);
-            }
-        });
-
-        draw.Text($"Camera zoom: {GlobalState.Camera.Zoom}", new Vector2(10, 10), Color.Red);
-        GlobalState.Menu.Draw(draw);
-    });
-});
-
-var logoTimeout = window.GetTargetFps() * 5;
-var logo = new Scene<LogoSceneData>(new() { Timeout = logoTimeout, }, data =>
+var logo = new Scene<LogoSceneData>(new(window.GetTargetFps() * 3), data =>
 {
     data.Timeout--;
     if (data.Timeout <= 0)
@@ -62,7 +28,7 @@ var logo = new Scene<LogoSceneData>(new() { Timeout = logoTimeout, }, data =>
         draw.Rectangle(
             new Rectangle
             {
-                Position = new Vector2(10 + (logoTimeout - data.Timeout) * 4, 10),
+                Position = new Vector2(10 + (data.DefaultTimeout - data.Timeout) * 4, 10),
                 Size = new Vector2(1000, 50)
             }, GruvboxColors.ForegroundLight);
 #if DEBUG
@@ -76,34 +42,16 @@ window.SetCurrentScene(logo);
 window.Present();
 
 
-void MovingCamera(Vector2 lastCursorPosition)
-{
-    if (Raylib.IsMouseButtonDown(MouseButton.Middle) ||
-        Raylib.IsKeyDown(KeyboardKey.Space) && Raylib.IsMouseButtonDown(MouseButton.Left))
-    {
-        GlobalState.Camera.Target += (lastCursorPosition - Raylib.GetMousePosition()) / GlobalState.Camera.Zoom;
-        GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
-
-        Raylib.SetMouseCursor(MouseCursor.ResizeAll);
-    }
-    else
-    {
-        Raylib.SetMouseCursor(MouseCursor.Arrow);
-    }
-}
-
-void ZoomCamera()
-{
-    GlobalState.Camera.Zoom += Raylib.GetMouseWheelMove() * 0.05f;
-
-    if (GlobalState.Camera.Zoom < MaxZoom)
-        GlobalState.Camera.Zoom = MaxZoom;
-    if (GlobalState.Camera.Zoom > MinZoom)
-        GlobalState.Camera.Zoom = MinZoom;
-}
-
 class LogoSceneData
 {
+    public int DefaultTimeout { get; }
+
+    public LogoSceneData(int defaultTimeout)
+    {
+        DefaultTimeout = defaultTimeout;
+        Timeout = DefaultTimeout;
+    }
+
     public int Timeout;
 }
 
