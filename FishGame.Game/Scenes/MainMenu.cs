@@ -14,9 +14,21 @@ public class MainMenu : IScene
         _window = window;
         _menus =
         [
-            new("Play", () => { _window.SetCurrentScene(new Gameplay());}),
+            new(
+                "Play",
+                () =>
+                {
+                    _window.SetCurrentScene(new Gameplay());
+                }
+            ),
             new("Settings", () => { }),
-            new("Quit", () => { Raylib.CloseWindow(); }),
+            new(
+                "Quit",
+                () =>
+                {
+                    Raylib.CloseWindow();
+                }
+            ),
         ];
     }
 
@@ -35,6 +47,11 @@ public class MainMenu : IScene
                 index++;
             }
         });
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }
 
@@ -64,4 +81,6 @@ internal record MenuItem(string Text, Action Action)
 #endif
         draw.Text(Text, position, color);
     }
+
+    public void Dispose() { }
 };
