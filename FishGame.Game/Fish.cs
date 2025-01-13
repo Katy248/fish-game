@@ -10,6 +10,8 @@ class Fish
     private float _radius = 18;
     private bool _captured;
     private bool _hover;
+    private string _name;
+    private Gamepad _gamepad;
 
     private int _moveDirectionX = 1;
     private int _moveDirectionY = 1;
@@ -18,12 +20,16 @@ class Fish
 
     const int ChangeDirectionTimeout = 50;
     private int _changeDirectionTimeout = ChangeDirectionTimeout;
+    private Func<Camera2D> _camera;
 
-    public static Fish WithPosition(Vector2 position)
+    public static Fish WithPosition(Vector2 position, Func<Camera2D> getCamera, Gamepad gamepad, string name = "Fish name")
     {
         return new Fish
         {
             _position = position,
+            _camera = getCamera,
+            _gamepad = gamepad,
+            _name = name,
         };
     }
 
@@ -43,24 +49,38 @@ class Fish
 
         d.Circle(_position, drawRadius, drawColor);
 
-        if (GlobalState.Camera.Zoom >= 1.4)
+        if (_camera().Zoom >= 1.4 || _hover)
         {
-            d.Text("Fish name", new Vector2(_position.X - 30, _position.Y + 30), GruvboxColors.Foreground);
+            d.Text(_name, new Vector2(_position.X - 30, _position.Y + 30), GruvboxColors.Foreground);
+        }
+    }
+
+    private Vector2 GetCursor()
+    {
+        if (_gamepad.Enabled)
+        {
+            return Raylib.GetScreenToWorld2D(new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2), _camera());
+        }
+        else
+        {
+            return Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), _camera());
         }
     }
 
     public void Update(Camera2D cam)
     {
-        var cursor = Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), cam);
+        var cursor = GetCursor();
         _hover = Raylib.CheckCollisionPointCircle(cursor, _position, _radius);
 
-        if (!_captured && _hover && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        if (!_captured && _hover &&
+                (Raylib.IsMouseButtonPressed(MouseButton.Left) || Raylib.IsGamepadButtonPressed(Gamepad.DefaultGamepad, GamepadButton.RightFaceDown)))
         {
             _captured = true;
             return;
         }
 
-        if (_captured && _hover && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        if (_captured && _hover &&
+                (Raylib.IsMouseButtonPressed(MouseButton.Left) || Raylib.IsGamepadButtonPressed(Gamepad.DefaultGamepad, GamepadButton.RightFaceDown)))
         {
             _captured = false;
             return;

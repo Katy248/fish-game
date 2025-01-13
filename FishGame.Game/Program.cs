@@ -7,8 +7,8 @@ using FishGame.Game.Scenes;
 
 var window = new Window("Fish game", onInit: () =>
     {
-        GlobalState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
-        GlobalState.Camera.Target = new Vector2(0, 0);
+        // GameplayState.Camera.Offset = new Vector2(Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight() / 2);
+        // GameplayState.Camera.Target = new Vector2(0, 0);
     })
     .Size(800, 600)
     .TargetFps(60);
@@ -59,10 +59,3 @@ class LogoSceneData
     public int Timeout;
 }
 
-static class GlobalState
-{
-    public static Camera2D Camera = new Camera2D { Zoom = 1 };
-    public static List<Fish> FishCollection = [Fish.WithPosition(new Vector2(150))];
-    public static Toolbar Menu = new Toolbar();
-    public static bool DarkModeEnabled = false;
-}

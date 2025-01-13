@@ -11,17 +11,19 @@ class Toolbar
     private int _menuHeight = 60;
     private int _menuContentMargin = 5;
 
+    private readonly List<Fish> _fishCollection;
+
     private List<Button> _buttons = new();
 
-    public Toolbar()
+    public Toolbar(List<Fish> fishCollection, Action<List<Fish>> addFish)
     {
-        _buttons.Add(new Button("Add",
-            () => { GlobalState.FishCollection.Add(Fish.WithPosition(new Vector2(Raylib.GetRandomValue(50, 150)))); }));
+        _fishCollection = fishCollection;
+        _buttons.Add(new Button("Add", () => addFish(fishCollection)));
         _buttons.Add(new Button("Remove", () =>
         {
-            if (GlobalState.FishCollection.Count == 0) return;
-            GlobalState.FishCollection.RemoveAt(GlobalState.FishCollection.Count - 1);
-        }, () => { return GlobalState.FishCollection.Count > 0; }));
+            if (_fishCollection.Count == 0) return;
+            _fishCollection.RemoveAt(_fishCollection.Count - 1);
+        }, () => { return _fishCollection.Count > 0; }));
     }
 
     public void Draw(Draw draw)
