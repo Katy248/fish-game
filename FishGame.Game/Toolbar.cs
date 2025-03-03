@@ -6,10 +6,10 @@ namespace FishGame.Game;
 
 class Toolbar
 {
-    private int _menuMargin = 20;
-    private int _menuPadding = 5;
-    private int _menuHeight = 60;
-    private int _menuContentMargin = 5;
+    private readonly int _menuMargin = 20;
+    private readonly int _menuPadding = 5;
+    private readonly int _menuHeight = 60;
+    private readonly int _menuContentMargin = 5;
 
     private readonly List<Fish> _fishCollection;
 
@@ -19,11 +19,21 @@ class Toolbar
     {
         _fishCollection = fishCollection;
         _buttons.Add(new Button("Add", () => addFish(fishCollection)));
-        _buttons.Add(new Button("Remove", () =>
-        {
-            if (_fishCollection.Count == 0) return;
-            _fishCollection.RemoveAt(_fishCollection.Count - 1);
-        }, () => { return _fishCollection.Count > 0; }));
+        _buttons.Add(
+            new Button(
+                "Remove",
+                () =>
+                {
+                    if (_fishCollection.Count == 0)
+                        return;
+                    _fishCollection.RemoveAt(_fishCollection.Count - 1);
+                },
+                () =>
+                {
+                    return _fishCollection.Count > 0;
+                }
+            )
+        );
     }
 
     public void Draw(Draw draw)
@@ -52,8 +62,13 @@ class Toolbar
         {
             var btn = _buttons[i];
 
-            btn.SetPosition(innerRect.Position +
-                            new Vector2(_menuContentMargin + gap * i + i * Button.Width, _menuContentMargin));
+            btn.SetPosition(
+                innerRect.Position
+                    + new Vector2(
+                        _menuContentMargin + gap * i + i * Button.Width,
+                        _menuContentMargin
+                    )
+            );
             btn.Draw(draw);
         }
     }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using FishGame.Game.Scenes;
 using RayGame;
 using Raylib_cs;
 
@@ -12,7 +13,7 @@ class Fish : IDisposable
     private bool _hover;
     private string _name;
     private Gamepad _gamepad;
-
+    private readonly GameplayState _state;
     private int _moveDirectionX = 1;
     private int _moveDirectionY = 1;
 
@@ -25,28 +26,23 @@ class Fish : IDisposable
     private Image _image;
     private Texture2D _texture;
 
-    public Fish()
+    public Fish(
+        string name,
+        Vector2 position,
+        Func<Camera2D> camera,
+        Gamepad gamepad,
+        GameplayState state
+    )
     {
+        _name = name;
+        _position = position;
+        _camera = camera;
+        _gamepad = gamepad;
+        this._state = state;
         _image = Raylib.LoadImage("./Assets/fish.png");
         _texture = Raylib.LoadTextureFromImage(_image);
         _texture.Width *= 2;
         _texture.Height *= 2;
-    }
-
-    public static Fish WithPosition(
-        Vector2 position,
-        Func<Camera2D> getCamera,
-        Gamepad gamepad,
-        string name = "Fish name"
-    )
-    {
-        return new Fish
-        {
-            _position = position,
-            _camera = getCamera,
-            _gamepad = gamepad,
-            _name = name,
-        };
     }
 
     public void Draw(Draw d)
@@ -63,22 +59,6 @@ class Fish : IDisposable
             drawRadius += 2;
         }
 
-        //         if (_moveDirectionX > 0) // move to right
-        //         {
-        //             _texture.Width = -_texture.Height;
-        // #if DEBUG
-        //             d.Text($"Should move right", new Vector2(10, 70), GruvboxColors.Blue);
-        // #endif
-        //         }
-        //         else
-        //         {
-        // #if DEBUG
-        //             d.Text($"Should move left", new Vector2(10, 70), GruvboxColors.Blue);
-        // #endif
-        //         }
-
-        //         d.Text($"Move direction: {_moveDirectionX}", new Vector2(10, 50), GruvboxColors.Orange);
-        // d.Texture(_texture, _position, scale: _moveDirectionX > 0 ? -1 : 1);
         d.TextureRec(
             _texture,
             new Rectangle
@@ -113,10 +93,12 @@ class Fish : IDisposable
         }
     }
 
-    public void Update(Camera2D cam)
+    private bool GetHover()
     {
+        if (_state.CurrentAction != GameplayState.GameplayAction.None)
+            return false;
         var cursor = GetCursor();
-        _hover = Raylib.CheckCollisionPointRec(
+        var hover = Raylib.CheckCollisionPointRec(
             cursor,
             new Rectangle
             {
@@ -127,6 +109,13 @@ class Fish : IDisposable
                 ),
             }
         );
+        return hover;
+    }
+
+    public void Update(Camera2D cam)
+    {
+        var cursor = GetCursor();
+        _hover = GetHover();
 
         if (
             !_captured
@@ -144,13 +133,13 @@ class Fish : IDisposable
             )
         )
         {
+            _state.CurrentAction = GameplayState.GameplayAction.HoldingFish;
             _captured = true;
             return;
         }
 
         if (
             _captured
-            && _hover
             && (
                 Raylib.IsMouseButtonPressed(MouseButton.Left)
                 || Raylib.IsGamepadButtonPressed(
@@ -165,6 +154,7 @@ class Fish : IDisposable
         )
         {
             _captured = false;
+            _state.CurrentAction = GameplayState.GameplayAction.None;
             return;
         }
 

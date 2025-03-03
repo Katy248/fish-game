@@ -3,7 +3,6 @@ using Raylib_cs;
 
 namespace FishGame.Game;
 
-
 public static class GruvboxColors
 {
     public static Color Yellow = new Color().FromHex("#D79921");

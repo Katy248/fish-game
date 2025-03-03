@@ -16,7 +16,12 @@ class Button
     private Vector2 _startPosition;
     private bool _hover;
 
-    public Button(string text, Action onClick, Func<bool>? enabled = null, Vector2 startPosition = default)
+    public Button(
+        string text,
+        Action onClick,
+        Func<bool>? enabled = null,
+        Vector2 startPosition = default
+    )
     {
         _text = text;
         _onClick = onClick;
@@ -27,31 +32,39 @@ class Button
 
     private void EvalRect()
     {
-        _rect = new Rectangle
-        {
-            Position = _startPosition,
-            Size = new Vector2(Width, Height),
-        };
+        _rect = new Rectangle { Position = _startPosition, Size = new Vector2(Width, Height) };
     }
 
-    public void SetPosition(Vector2 position) { _startPosition = position; EvalRect(); }
+    public void SetPosition(Vector2 position)
+    {
+        _startPosition = position;
+        EvalRect();
+    }
 
     public void Draw(Draw draw)
     {
         var padding = 15;
         var bgColor = _hover ? GruvboxColors.YellowDim : GruvboxColors.Yellow;
         var fgColor = _hover ? GruvboxColors.Background : GruvboxColors.Foreground;
-        if (_enabled != null && !_enabled()) {bgColor = GruvboxColors.Background; fgColor = GruvboxColors.Foreground;}
+        if (_enabled != null && !_enabled())
+        {
+            bgColor = GruvboxColors.Background;
+            fgColor = GruvboxColors.Foreground;
+        }
         draw.Rectangle(_rect, bgColor);
         draw.Text(_text, _startPosition + new Vector2(padding), fgColor);
     }
+
     public void Update()
     {
-        if (_enabled != null && !_enabled()) return;
+        if (_enabled != null && !_enabled())
+            return;
         var cursor = Raylib.GetMousePosition();
 
         _hover = Raylib.CheckCollisionPointRec(cursor, _rect);
-        if (_hover && Raylib.IsMouseButtonPressed(MouseButton.Left)) { _onClick(); }
+        if (_hover && Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            _onClick();
+        }
     }
-
 }

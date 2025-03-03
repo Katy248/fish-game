@@ -15,6 +15,15 @@ class GameplayState
     public List<Fish> FishCollection = new();
     public Toolbar Toolbar;
     public bool DarkModeEnabled = false;
+
+    public enum GameplayAction
+    {
+        None,
+        HoldingFish,
+        AddingFish,
+    }
+
+    public GameplayAction CurrentAction = GameplayAction.None;
 }
 
 public class Gameplay : IScene
@@ -37,17 +46,18 @@ public class Gameplay : IScene
         var addFish = (List<Fish> fish) =>
         {
             fish.Add(
-                Fish.WithPosition(
+                new Fish(
+                    $"Cool fish {Raylib.GetRandomValue(1, 100)}",
                     new Vector2(Raylib.GetRandomValue(50, 200), Raylib.GetRandomValue(50, 200)),
                     getCamera,
                     _gamepad,
-                    name: $"Cool fish {Raylib.GetRandomValue(1, 100)}"
+                    this._state
                 )
             );
         };
         _state = new(addFish);
         _state.FishCollection.Add(
-            Fish.WithPosition(new Vector2(150), getCamera, _gamepad, "First fish")
+            new Fish("First fish", new Vector2(150), getCamera, _gamepad, _state)
         );
         _lastCursorPosition = Raylib.GetMousePosition();
     }

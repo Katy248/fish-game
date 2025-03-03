@@ -7,7 +7,13 @@ public class Gamepad
 {
     public const int DefaultGamepad = 0;
 
-    private readonly GamepadAxis[] Axises = [GamepadAxis.RightY, GamepadAxis.RightX, GamepadAxis.LeftY, GamepadAxis.LeftX];
+    private readonly GamepadAxis[] Axises =
+    [
+        GamepadAxis.RightY,
+        GamepadAxis.RightX,
+        GamepadAxis.LeftY,
+        GamepadAxis.LeftX,
+    ];
 
     private float _deadZone = 0.1f;
 
@@ -39,6 +45,4 @@ public class Gamepad
         }
         return 0f;
     }
-
-
 }
